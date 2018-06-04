@@ -141,7 +141,7 @@ def addLink(server_name, listen_url, bitrate, from_recent):
   listen_url = unescapeString(listen_url)
   # Try to fix all incorrect values for bitrate (remove letters, reset to 0 etc.)
   bitrate = re.sub('\D','',bitrate)
-  try: 
+  try:
     bit = int(bitrate)
   except:
     bit = 0
@@ -155,15 +155,15 @@ def addLink(server_name, listen_url, bitrate, from_recent):
   xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,isFolder=False)
 
 # Get a search query from keyboard
-def readKbd():
-  kb = xbmc.Keyboard("", __language__(30092), False)
+def readKbd(title):
+  kb = xbmc.Keyboard("", title, False)
   kb.doModal()
   if (kb.isConfirmed() and len(kb.getText()) > 2):
     return kb.getText()
 
 # Play a link
 def playLink(listen_url):
-  log("PLAY URL: %s" % listen_url)   
+  log("PLAY URL: %s" % listen_url)
   xbmc.Player().play(listen_url)
 
 # Read command-line parameters
@@ -191,7 +191,7 @@ def log(msg):
 # Log NOTICE
 def log_notice(msg):
   xbmc.log("### [%s] - %s" % (__addonname__,msg,),level=xbmc.LOGNOTICE )
- 
+
 # Sorting
 def sort(dir=False):
   if dir:
@@ -200,7 +200,7 @@ def sort(dir=False):
   else:
     xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_LABEL, label2Mask="%X")
     xbmcplugin.addSortMethod(handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_BITRATE, label2Mask="%X")
-  xbmcplugin.endOfDirectory(int(sys.argv[1]))        
+  xbmcplugin.endOfDirectory(int(sys.argv[1]))
 
 def sortUnsorted(dir=False):
   if dir:
@@ -233,7 +233,7 @@ def unescapeHTML(text):
   try:
     text = unicode(text, 'utf-8')
     ret = re.sub("&#?\w+;", fixup, text)
-  except: 
+  except:
     ret = text
   return ret
 

@@ -15,7 +15,7 @@
 # *
 # */
 
-import xbmcgui, xbmcplugin, xbmcaddon
+import xbmcgui, xbmcplugin, xbmcaddon, urllib
 
 from icecast_common import *
 from icecast_init import *
@@ -62,7 +62,7 @@ if use_sqlite == 1:
       putTimestamp(sqlite_con, sqlite_cur)
 
 elif use_sqlite == 0:
-  from icecast_dom import * 
+  from icecast_dom import *
   timestamp_expired = timestampExpired()
   if timestamp_expired == 1:
     xml, dialog_was_canceled = readRemoteXML()
@@ -75,7 +75,7 @@ elif use_sqlite == 0:
 
 # Mode selector
 if mode == "search":
-  query = readKbd()
+  query = readKbd(__language__(30092))
   if use_sqlite == 1:
     doSearch(sqlite_cur, query)
   else:
@@ -137,13 +137,13 @@ elif mode == "favourites":
       dialog = xbmcgui.Dialog()
       dialog.ok(__language__(30098), __language__(30106))
     else:
-      showFavourites(sqlite_cur)  
+      showFavourites(sqlite_cur)
 
 elif mode == "play":
   if use_sqlite == 1:
     if fav_action == "open":
       # Add a 'play' link
-      bitrate = getBitrate(sqlite_cur, params["url"])
+      bitrate = str(getBitrate(sqlite_cur, params["url"]))
       addLink(__language__(30101), params["url"], bitrate, 0)
       # Add a 'add to favourites' link
       u = "%s?mode=favourites&url=%s&fav_action=add" % (sys.argv[0], params["url"])
@@ -154,9 +154,16 @@ elif mode == "play":
     else:
       if mod_recent == 0:
         addRecent(sqlite_con, sqlite_cur, params["url"])
-      playLink(params["url"])
+      playLink(urllib.unquote(params["url"]))
   else:
-    playLink(params["url"])
+    playLink(urllib.unquote(params["url"]))
+
+elif mode == "url":
+  stationUrl = readKbd(__language__(30107))
+  if use_sqlite == 1:
+    if mod_recent == 0:
+        addRecent(sqlite_con, sqlite_cur, stationUrl)
+  playLink(stationUrl)
 
 else:
   u = "%s?mode=list" % (sys.argv[0],)
@@ -166,6 +173,10 @@ else:
   u = "%s?mode=search" % (sys.argv[0],)
   liz=xbmcgui.ListItem(__language__(30091), iconImage="DefaultFolder.png", thumbnailImage="")
   xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,isFolder=True)
+
+  u = "%s?mode=url" % (sys.argv[0],)
+  liz=xbmcgui.ListItem(__language__(30107), iconImage="DefaultAudio.png", thumbnailImage="")
+  xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=u,listitem=liz,isFolder=False)
 
   if use_sqlite == 1:
     u = "%s?mode=recent" % (sys.argv[0],)
